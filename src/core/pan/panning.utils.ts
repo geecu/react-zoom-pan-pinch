@@ -13,7 +13,11 @@ export const isPanningStartAllowed = (
   event: MouseEvent | TouchEvent,
 ): boolean => {
   const { excluded } = contextInstance.setup.panning;
-  const { isInitialized, wrapperComponent } = contextInstance;
+  const { isInitialized, wrapperComponent, transformState: {scale} } = contextInstance;
+
+  if (event instanceof TouchEvent && event.touches.length === 1 && scale === 1) {
+    return false;
+  }
 
   const target = event.target as HTMLElement;
   const targetIsShadowDom = "shadowRoot" in target && "composedPath" in event;
