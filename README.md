@@ -1,3 +1,14 @@
+# Fork development
+
+This is a fork that copies the `dist` files to a certain project (MMN) so that it can be used without hassling with npm.
+
+To build and copy the `dist` folder to the said project (check rollup.config.js for the destination), run:
+
+```sh
+./node_modules/.bin/rollup -c -w
+```
+
+
 # 🖼 React Zoom Pan Pinch
 
 > Super fast and light react npm package for zooming, panning and pinching html

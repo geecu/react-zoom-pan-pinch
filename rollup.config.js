@@ -5,6 +5,35 @@ import typescript from "@rollup/plugin-typescript";
 import postcss from "rollup-plugin-postcss";
 import dts from "rollup-plugin-dts";
 import pkg from "./package.json";
+import { promises as fs } from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = path.dirname(__filename);
+
+async function copyDirectory(srcDir, destDir) {
+  try {
+    await fs.mkdir(destDir, { recursive: true });
+
+    const entries = await fs.readdir(srcDir, { withFileTypes: true });
+
+    for (const entry of entries) {
+      const srcPath = path.join(srcDir, entry.name);
+      const destPath = path.join(destDir, entry.name);
+
+      if (entry.isDirectory()) {
+        await copyDirectory(srcPath, destPath);
+      } else {
+        console.log('copied', srcPath, 'into', destPath);
+        await fs.copyFile(srcPath, destPath);
+      }
+    }
+
+    console.log(`Directory copied from ${srcDir} to ${destDir}`);
+  } catch (err) {
+    console.error(`Error copying directory: ${err}`);
+  }
+}
 
 export default [
   {
@@ -24,6 +53,7 @@ export default [
       },
     ],
     plugins: [
+      myCustomPlugin(),
       external(),
       babel({
         babelHelpers: "bundled",
@@ -55,3 +85,16 @@ export default [
     ],
   },
 ];
+
+function myCustomPlugin() {
+  return {
+    name: 'my-custom-plugin',
+    buildEnd() {
+      console.log('Build is done!');
+      setTimeout(() => {
+        copyDirectory(__dirname + '/dist', '../../mmn/app/react-zoom-pan-pinch');
+      }, 1000);
+    }
+  };
+}
+
